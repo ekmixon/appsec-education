@@ -1,5 +1,5 @@
 # 0Clone
-FROM debian:latest
+FROM debian:11
 
 EXPOSE 35000-55000
 
