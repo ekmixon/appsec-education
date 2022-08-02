@@ -20,7 +20,7 @@ def generate(data):
     json_payload = base64.b64encode(json.dumps(payload).encode('utf-8'))
 
     # Build message and signature
-    message = '{}.{}'.format(json_header, json_payload).encode('utf-8')
+    message = f'{json_header}.{json_payload}'.encode('utf-8')
 
     # Get secret source based on desired algorithm
     if useAlgorithm == 'HS256':
@@ -28,7 +28,7 @@ def generate(data):
 
     elif useAlgorithm == 'RS256':
         username = data['username']
-        secret = open('keys/'+username+'/private.pem', "r").read().strip()
+        secret = open(f'keys/{username}/private.pem', "r").read().strip()
 
     # Generate signature based on algorithm
     if useAlgorithm == 'HS256':
@@ -38,7 +38,7 @@ def generate(data):
         # Generate the signature using the private key
         rsakey = RSA.importKey(secret)
         signer = pkcs1_15.new(rsakey)
-        
+
         digest = SHA256.new()
         digest.update(message)
         sign = signer.sign(digest)
@@ -60,7 +60,10 @@ def parse(token):
     json_header = json.loads(base64.b64decode(parts[0]).decode('utf-8'))
     json_payload = json.loads(base64.b64decode(parts[1]).decode('utf-8'))
     algorithm = json_header['alg']
-    message = '{}.{}'.format(parts[0].encode('utf-8'), parts[1].encode('utf-8')).encode('utf-8')
+    message = f"{parts[0].encode('utf-8')}.{parts[1].encode('utf-8')}".encode(
+        'utf-8'
+    )
+
 
     # Get secret source based on our desired algorithm
     if useAlgorithm == 'HS256':
@@ -68,7 +71,7 @@ def parse(token):
 
     elif useAlgorithm == 'RS256':
         username = json_payload['claims']['username']
-        secret = open('keys/'+username+'/public.pem', "r").read().strip()
+        secret = open(f'keys/{username}/public.pem', "r").read().strip()
 
     # Verify the signature based on the algorithm type provided in the token
     if json_header['alg'].lower() == 'none':
@@ -92,9 +95,6 @@ def parse(token):
 
         signature = hmac.new(secret, message, hashlib.sha256)
 
-        if signature.hexdigest() != parts[2]:
-            return False
-        else:
-            return json_payload
+        return False if signature.hexdigest() != parts[2] else json_payload
     else:
         return False

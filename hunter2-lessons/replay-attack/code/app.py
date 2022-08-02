@@ -65,8 +65,7 @@ class Register(Resource):
         username = request.form['username']
         password = request.form['password'].encode('utf-8')
 
-        user = user_manager.findByUsername(username)
-        if user:
+        if user := user_manager.findByUsername(username):
             return jsonFail('User must be unique.', 400)
 
         user_manager.addUser({
@@ -119,10 +118,7 @@ class Transfer(Resource):
             return jsonFail('Valid "amount" required', 400)
 
         amount = request.form['amount']
-        return {
-            'messsage': 'Transfer of ${} successful!'.format(amount),
-            'success': True
-        }
+        return {'messsage': f'Transfer of ${amount} successful!', 'success': True}
 
 
 api.add_resource(Login, '/login')

@@ -27,8 +27,8 @@ def login():
             error = 'Username is a required field'
 
         user = findUser(username)
-        if (user == None):
-            error = 'User ' + username + ' not found'
+        if user is None:
+            error = f'User {username} not found'
 
         if bcrypt.checkpw(password.encode('utf8'), user['password'].encode('utf8')) == True:
             code = random.randint(1000,9999)
@@ -40,7 +40,7 @@ def login():
         else:
             error = 'Invalid password'
 
-    if (len(error) > 0):
+    if error != "":
         return render_template('login.html', error=error)
     else:
         return render_template('login.html', success=success, code=code, username=username)
@@ -49,7 +49,7 @@ def login():
 def register():
     error = ''
     success = ''
-    
+
     if (request.method == 'POST'):
         username = request.form['username']
         password = request.form['password']
@@ -65,10 +65,11 @@ def register():
         else:
             error = 'Error registering user!'
 
-    if (len(error) > 0):
-        return render_template('register.html', error=error)
-    else:
-        return render_template('register.html', success=success)
+    return (
+        render_template('register.html', error=error)
+        if error
+        else render_template('register.html', success=success)
+    )
 
 @app.route('/user/code', methods=['GET', 'POST'])
 def code():
@@ -84,7 +85,7 @@ def code():
         if not code or code == 'None':
             code = None
 
-        if (len(error) == 0):
+        if not error:
             user = findUser(username)
 
             if (secureCompare(code, user['code']) == True):
@@ -93,16 +94,16 @@ def code():
             else:
                 error = 'Error with the code provided'
 
-    if (len(error) > 0):
-        return render_template('code.html', error=error)
-    else:
-        return render_template('code.html', success=success)
+    return (
+        render_template('code.html', error=error)
+        if error
+        else render_template('code.html', success=success)
+    )
 
 ## Helper functions
 def readJson():
     with open('users.json') as json_file:
-        data = json.load(json_file)
-        return data
+        return json.load(json_file)
 
 def writeJson(data):
     with open('users.json', 'w') as f:

@@ -19,10 +19,7 @@ def userById(user_id):
     data = parseJson()
     user = findUser(user_id, data)
 
-    if user != False:
-        return jsonify(user)
-    else:
-        return jsonify({"Error":"user not found"})    
+    return jsonify(user) if user != False else jsonify({"Error":"user not found"})    
 
 @app.route("/save", methods=['POST'])
 def clientSave():
@@ -71,9 +68,7 @@ def readJson():
 
 def parseJson():
     f = open('data/users.json', 'r')
-    data = json.loads(f.read())
-
-    return data
+    return json.loads(f.read())
 
 def writeJson(data):
     f = open('data/users.json', 'w')
@@ -82,8 +77,4 @@ def writeJson(data):
     return True
     
 def findUser(user_id, data):
-    for user in data['users']:
-        if user['id'] == user_id:
-            return user
-    
-    return False
+    return next((user for user in data['users'] if user['id'] == user_id), False)

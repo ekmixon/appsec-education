@@ -11,19 +11,19 @@ def index():
 def vulnerable():
     username = request.args.get('username')
 
-    if username == None:
+    if username is None:
         resp = make_response('Please provide a valid username')
         return resp
 
     if "\n" in username or "\r" in username:
-        header = 'username=%s' % username
+        header = f'username={username}'
         resp = make_response('Exploited!')
         resp.headers = werkzeug.datastructures.Headers([
             ('X-Username', header)
         ])
     else:
-        resp = make_response('Hello %s!' % username)
-        resp.headers['X-Username'] = '%s' % username
+        resp = make_response(f'Hello {username}!')
+        resp.headers['X-Username'] = f'{username}'
 
     return resp
 

@@ -28,14 +28,17 @@ def getAll():
     return data['users']
 
 def find(type, match, data=None):
-    if data == None:
+    if data is None:
         data = parseJson()
-        
-    for user in data['users']:
-        if type in user and str(user[type]) == str(match):
-            return user
-    
-    return False
+
+    return next(
+        (
+            user
+            for user in data['users']
+            if type in user and str(user[type]) == str(match)
+        ),
+        False,
+    )
     
 def findById(user_id, data=None):
     return find('id', user_id, data)
@@ -59,9 +62,7 @@ def readJson():
 
 def parseJson():
     f = open('data/users.json', 'r')
-    data = json.loads(f.read())
-
-    return data
+    return json.loads(f.read())
 
 def writeJson(data):
     f = open('data/users.json', 'w')

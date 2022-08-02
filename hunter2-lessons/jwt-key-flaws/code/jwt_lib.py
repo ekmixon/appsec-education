@@ -13,10 +13,9 @@ def generate(data):
 
     elif use_algorithm == 'RS256':
         username = data['username']
-        secret = open('keys/'+username+'/private.pem', "r").read().strip()
+        secret = open(f'keys/{username}/private.pem', "r").read().strip()
 
-    token = jwt.encode(data, secret, algorithm=use_algorithm)
-    return token
+    return jwt.encode(data, secret, algorithm=use_algorithm)
 
 def parse(token):
     # Find the user with the token
@@ -27,10 +26,10 @@ def parse(token):
     try:
         if use_algorithm == 'HS256':
             secret = use_secret
-        
+
         elif use_algorithm == 'RS256':
-            secret = open('keys/'+user.username+'/public.pem', "r").read().strip()
-            
+            secret = open(f'keys/{user.username}/public.pem', "r").read().strip()
+
         return jwt.decode(token, secret, algorithms=[use_algorithm])
 
     except (InvalidSignatureError):

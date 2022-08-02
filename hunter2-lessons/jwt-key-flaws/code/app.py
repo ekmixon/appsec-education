@@ -32,9 +32,7 @@ class Login(Resource):
     def post(self):
         username = request.form['username']
         password = request.form['password']
-        user = userManager.findByUsername(username)
-
-        if user:
+        if user := userManager.findByUsername(username):
             user_password = user.password.encode('utf-8')
             if bcrypt.checkpw(password.encode('utf-8'), user_password):
                 # Make the token and store it in the user record
@@ -93,14 +91,11 @@ class Token(Resource):
         header_b64 = base64.urlsafe_b64encode(header).decode().strip('=')
         message_b64 = base64.urlsafe_b64encode(message).decode().strip('=')
 
-        signing_message = '{}.{}'.format(header_b64, message_b64)
+        signing_message = f'{header_b64}.{message_b64}'
         signature = hmac.new(secret.encode('ascii'), signing_message.encode('utf-8'), hashlib.sha256).digest()
 
-        token = '{}.{}.{}'.format(
-            header_b64,
-            message_b64,
-            base64.urlsafe_b64encode(signature).decode().strip('=')
-        )
+        token = f"{header_b64}.{message_b64}.{base64.urlsafe_b64encode(signature).decode().strip('=')}"
+
 
         return {'token': token}
 
