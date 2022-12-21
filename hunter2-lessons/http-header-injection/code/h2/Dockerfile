@@ -1,5 +1,5 @@
 # 0Clone
-FROM debian:latest
+FROM debian:bullseye
 
 EXPOSE 35000-55000
 
